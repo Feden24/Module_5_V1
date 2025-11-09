@@ -1,0 +1,31 @@
+body {
+    font-family: sans-serif;
+    background: #fafafa;
+    color: #333;
+    text-align: center;
+    margin: 40px;
+}
+
+textarea {
+    width: 80%;
+    height: 80px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+div {
+    margin: 10px 0;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 4px #ccc;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}

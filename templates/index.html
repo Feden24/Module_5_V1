@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Network Reliability Test</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Network Reliability Testing simulator</h1>
+
+  <textarea id="input" placeholder="Enter a sentence..."></textarea><br>
+  <button onclick="simulate()">Simulate Transmission</button>
+
+  <h3>Original Checksummed Words:</h3>
+  <div id="original"></div>
+
+ 
+  <p id="progress-text"></p>
+
+  <button id="toggle-log" class="collapsible" style="display:none;">Show Transmission Log ⬇</button>
+  <div id="log" class="content" style="display:none;"></div>
+
+  <h3>Final Received Sentence:</h3>
+  <div id="final"></div>
+
+<script>
+async function simulate() {
+  const sentence = document.getElementById("input").value.trim();
+  if (!sentence) {
+    alert("Please enter a sentence first.");
+    return;
+  }
+
+  const res = await fetch("/simulate", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({sentence})
+  });
+  const data = await res.json();
+
+  document.getElementById("original").innerText = data.original.join(" ");
+  document.getElementById("final").innerText = data.final_sentence;
+
+  // --- PROGRESS BAR ---
+ 
+  const text = document.getElementById("progress-text");
+
+ 
+  text.innerText = `Success rate: ${data.success_rate}% (words received correctly on first try)`;
+
+  // --- COLLAPSIBLE LOG ---
+  const logButton = document.getElementById("toggle-log");
+  const logDiv = document.getElementById("log");
+  logDiv.innerHTML = "";
+
+  data.log.forEach((attempts, i) => {
+    const block = document.createElement("div");
+    block.classList.add("word-log");
+    block.innerHTML = `<b>Word ${i + 1}:</b><br>` + attempts.map(a =>
+      a.valid === undefined
+        ? `<span class="error">${a.attempt}</span>`
+        : a.valid
+          ? `<span class="success">✅ ${a.attempt}</span>`
+          : `<span class="fail">❌ ${a.attempt}</span>`
+    ).join("<br>");
+    logDiv.appendChild(block);
+  });
+
+  // Show collapsible button
+  logButton.style.display = "inline-block";
+  logButton.innerText = "Show Transmission Log ⬇";
+  logDiv.style.display = "none";
+
+  logButton.onclick = () => {
+    const isHidden = logDiv.style.display === "none";
+    logDiv.style.display = isHidden ? "block" : "none";
+    logButton.innerText = isHidden
+      ? "Hide Transmission Log ⬆"
+      : "Show Transmission Log ⬇";
+  };
+}
+</script>
+</body>
+</html>
+<!-- End of templates/index.html -->
